@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taming.io Dagger 1v1 Tiers</title>
+
+  <style>
+    :root {
+      --bg: #0e0e11;
+      --card: #17171d;
+      --text: #e6e6eb;
+      --muted: #9a9aa5;
+      --accent: #7c7cff;
+    }
+
+    * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .rules {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+    }
+
+    .rules h2 { margin-top: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .player {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #222;
+    }
+
+    .info { flex: 1; }
+
+    .name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .region {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .tier {
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Tier colors */
+    .HT1 { background: #ff3b3b; color: #fff; }
+    .LT1 { background: #ff8c3b; color: #000; }
+    .HT2 { background: #ffb03b; color: #000; }
+    .LT2 { background: #ffd23b; color: #000; }
+    .HT3 { background: #7cff3b; color: #000; }
+    .LT3 { background: #3bffb0; color: #000; }
+    .HT4 { background: #3bbcff; color: #000; }
+    .LT4 { background: #3b7cff; color: #fff; }
+    .HT5 { background: #7c3bff; color: #fff; }
+    .LT5 { background: #555; color: #fff; }
+
+    footer {
+      margin-top: 48px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Taming.io – Dagger 1v1 Tiers</h1>
+  <div class="subtitle">Community‑run competitive ranking system</div>
+
+  <div class="rules">
+    <h2>Rules</h2>
+    <ul>
+      <li>Mode: <strong>Dagger 1v1</strong> only</li>
+      <li>First to <strong>5 points</strong> wins</li>
+      <li>Shield usage must be <strong>agreed on before the fight</strong></li>
+      <li>Tier tester decides your tier after the match</li>
+      <li>To rank up past <strong>LT2</strong>, you must defeat an <strong>LT2</strong> player</li>
+      <li><strong>HT1</strong> is the highest rank and is limited to <strong>one player</strong></li>
+    </ul>
+  </div>
+
+  <div class="grid" id="players"></div>
+
+  <footer>
+    Not affiliated with taming.io • Rankings decided by certified testers
+  </footer>
+
+  <script>
+    const players = [
+      {
+        name: "Bigman",
+        tier: "LT2",
+        region: "EU",
+        avatar: "https://i.imgur.com/0y0y0y0.png"
+      },
+      {
+        name: "PlayerTwo",
+        tier: "HT3",
+        region: "NA",
+        avatar: "https://i.imgur.com/0y0y0y0.png"
+      },
+      {
+        name: "TopPlayer",
+        tier: "HT1",
+        region: "AS",
+        avatar: "https://i.imgur.com/0y0y0y0.png"
+      }
+    ];
+
+    const container = document.getElementById('players');
+
+    players.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'player';
+
+      card.innerHTML = `
+        <img class="avatar" src="${p.avatar}" />
+        <div class="info">
+          <div class="name">${p.name}</div>
+          <div class="region">Region: ${p.region}</div>
+        </div>
+        <div class="tier ${p.tier}">${p.tier}</div>
+      `;
+
+      container.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>
