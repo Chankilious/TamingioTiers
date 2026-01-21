@@ -31,16 +31,24 @@
     h1 { text-align: center; margin-bottom: 6px; }
     .subtitle { text-align: center; color: var(--muted); margin-bottom: 32px; }
 
-    .rules {
-      background: var(--card);
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 48px;
-      max-width: 900px;
-      margin-inline: auto;
+    /* Info boxes */
+    .info-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto 56px auto;
     }
 
-    /* Leaderboard layout */
+    .box {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .box h3 { margin-top: 0; }
+
+    /* Leaderboards */
     .leaderboard {
       background: var(--card);
       border-radius: 16px;
@@ -57,7 +65,7 @@
 
     .header, .row {
       display: grid;
-      grid-template-columns: 40px 56px 1fr 120px 80px;
+      grid-template-columns: 40px 56px 1fr 80px;
       align-items: center;
       gap: 12px;
       padding: 10px 16px;
@@ -96,20 +104,16 @@
       font-weight: 700;
       text-align: center;
       width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 0 auto;
     }
 
     .EU { border: 2px solid var(--eu); color: var(--eu); }
     .NA { border: 2px solid var(--na); color: var(--na); }
     .AS { border: 2px solid var(--as); color: var(--as); }
 
-    .tier {
-      text-align: right;
-      font-weight: 800;
-    }
+    .tier { text-align: right; font-weight: 800; }
 
-    /* Layout positioning */
+    /* Layout */
     .global-wrapper {
       max-width: 900px;
       margin: 0 auto 80px auto;
@@ -117,9 +121,9 @@
 
     .regional-wrapper {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1200px;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 32px;
+      max-width: 1300px;
       margin: 0 auto;
     }
 
@@ -136,19 +140,33 @@
 <h1>Taming.io – Dagger 1v1</h1>
 <div class="subtitle">Official Community Leaderboards</div>
 
-<div class="rules">
-  <h3>Rules</h3>
-  <ul>
-    <li>Dagger 1v1 only • First to 5 points</li>
-    <li>Shield usage must be agreed before the fight</li>
-    <li>Each region may only have <strong>one HT1</strong></li>
-    <li>The <strong>GLOBAL leaderboard</strong> may only have <strong>one HT1</strong></li>
-    <li>Only the <strong>top 10</strong> players per region may use a custom skin</li>
-  </ul>
+<div class="info-wrapper">
+  <div class="box">
+    <h3>Rules</h3>
+    <ul>
+      <li>Dagger 1v1 only • First to 5 points</li>
+      <li>Shield usage must be agreed before the fight</li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h3>Tiers</h3>
+    <ul>
+      <li><strong>HT1</strong> – Best player in the category</li>
+      <li><strong>LT1</strong></li>
+      <li><strong>HT2</strong></li>
+      <li><strong>LT2</strong></li>
+      <li><strong>HT3</strong> – Tier testers</li>
+      <li><strong>LT3</strong></li>
+      <li><strong>HT4</strong></li>
+      <li><strong>LT4</strong></li>
+      <li><strong>HT5</strong></li>
+      <li><strong>LT5</strong> – Untested</li>
+    </ul>
+  </div>
 </div>
 
 <div class="global-wrapper" id="global"></div>
-
 <div class="regional-wrapper" id="regional"></div>
 
 <footer>
@@ -158,15 +176,15 @@
 <script>
 const players = [
   { name: "GlobalKing", tier: "HT1", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "SecondBest", tier: "LT1", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
   { name: "EU_Pro", tier: "HT2", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
-  { name: "NA_God", tier: "HT1", region: "NA", avatar: "https://i.imgur.com/0y0y0y0.png" },
-  { name: "AS_King", tier: "HT1", region: "AS", avatar: "https://i.imgur.com/0y0y0y0.png" },
-  { name: "Bigman", tier: "LT2", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" }
+  { name: "NA_God", tier: "LT1", region: "NA", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "AS_King", tier: "LT1", region: "AS", avatar: "https://i.imgur.com/0y0y0y0.png" }
 ];
 
 const tierOrder = ["HT1","LT1","HT2","LT2","HT3","LT3","HT4","LT4","HT5","LT5"];
 
-function buildLeaderboard(title, list) {
+function buildLeaderboard(title, list, showRegion) {
   const board = document.createElement('div');
   board.className = 'leaderboard';
 
@@ -176,7 +194,7 @@ function buildLeaderboard(title, list) {
       <div>#</div>
       <div></div>
       <div>Player</div>
-      <div>Region</div>
+      ${showRegion ? '<div>Region</div>' : ''}
       <div>Tier</div>
     </div>
   `;
@@ -185,15 +203,11 @@ function buildLeaderboard(title, list) {
     const row = document.createElement('div');
     row.className = 'row ' + (i===0?'top1':i===1?'top2':i===2?'top3':'');
 
-    const avatar = i < 10 && p.avatar
-      ? `<img class="avatar" src="${p.avatar}">`
-      : `<div class="avatar"></div>`;
-
     row.innerHTML = `
       <div class="pos">${i+1}</div>
-      ${avatar}
+      <img class="avatar" src="${p.avatar}">
       <div class="name">${p.name}</div>
-      <div><span class="region-tag ${p.region}">${p.region}</span></div>
+      ${showRegion ? `<div><span class="region-tag ${p.region}">${p.region}</span></div>` : ''}
       <div class="tier">${p.tier}</div>
     `;
 
@@ -203,22 +217,23 @@ function buildLeaderboard(title, list) {
   return board;
 }
 
-// GLOBAL leaderboard (only one HT1 allowed)
+// GLOBAL leaderboard (only ONE HT1)
 const globalPlayers = [...players]
-  .sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+  .sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier))
+  .map((p,i) => i === 0 ? p : { ...p, tier: i === 1 ? 'LT1' : p.tier });
 
 document.getElementById('global').appendChild(
-  buildLeaderboard('🌍 GLOBAL LEADERBOARD', globalPlayers)
+  buildLeaderboard('🌍 GLOBAL LEADERBOARD', globalPlayers, true)
 );
 
-// Regional leaderboards
+// Regional leaderboards (no region column)
 ['EU','NA','AS'].forEach(region => {
   const regionalPlayers = players
     .filter(p => p.region === region)
     .sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
 
   document.getElementById('regional').appendChild(
-    buildLeaderboard(`${region} Leaderboard`, regionalPlayers)
+    buildLeaderboard(`${region} Leaderboard`, regionalPlayers, false)
   );
 });
 </script>
