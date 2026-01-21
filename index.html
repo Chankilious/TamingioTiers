@@ -11,10 +11,13 @@
       --card: #17171d;
       --text: #e6e6eb;
       --muted: #9a9aa5;
-      --accent: #7c7cff;
+      --gold: #ffd700;
+      --silver: #cfd8dc;
+      --bronze: #cd7f32;
     }
 
     * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
+
     body {
       margin: 0;
       background: var(--bg);
@@ -22,14 +25,8 @@
       padding: 24px;
     }
 
-    h1 {
-      margin-bottom: 4px;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
+    h1 { margin-bottom: 4px; }
+    .subtitle { color: var(--muted); margin-bottom: 24px; }
 
     .rules {
       background: var(--card);
@@ -38,63 +35,50 @@
       margin-bottom: 32px;
     }
 
-    .rules h2 { margin-top: 0; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-
-    .player {
+    .leaderboard {
       background: var(--card);
       border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+      margin-bottom: 32px;
+      overflow: hidden;
     }
 
+    .leaderboard h2 {
+      margin: 0;
+      padding: 14px 16px;
+      background: #1f1f27;
+      font-size: 18px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 40px 56px 1fr 80px 70px;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .row.top1 { background: rgba(255,215,0,0.08); }
+    .row.top2 { background: rgba(207,216,220,0.08); }
+    .row.top3 { background: rgba(205,127,50,0.08); }
+
+    .pos { font-weight: 700; opacity: 0.8; }
+
     .avatar {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       border-radius: 10px;
       object-fit: cover;
       background: #222;
     }
 
-    .info { flex: 1; }
-
-    .name {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .region {
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .name { font-weight: 600; }
+    .region { font-size: 13px; color: var(--muted); }
 
     .tier {
-      font-size: 13px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-weight: 600;
-      white-space: nowrap;
+      text-align: right;
+      font-weight: 700;
     }
-
-    /* Tier colors */
-    .HT1 { background: #ff3b3b; color: #fff; }
-    .LT1 { background: #ff8c3b; color: #000; }
-    .HT2 { background: #ffb03b; color: #000; }
-    .LT2 { background: #ffd23b; color: #000; }
-    .HT3 { background: #7cff3b; color: #000; }
-    .LT3 { background: #3bffb0; color: #000; }
-    .HT4 { background: #3bbcff; color: #000; }
-    .LT4 { background: #3b7cff; color: #fff; }
-    .HT5 { background: #7c3bff; color: #fff; }
-    .LT5 { background: #555; color: #fff; }
 
     footer {
       margin-top: 48px;
@@ -106,67 +90,80 @@
 </head>
 <body>
 
-  <h1>Taming.io – Dagger 1v1 Tiers</h1>
-  <div class="subtitle">Community‑run competitive ranking system</div>
+<h1>Taming.io – Dagger 1v1 Tiers</h1>
+<div class="subtitle">Vertical competitive leaderboards</div>
 
-  <div class="rules">
-    <h2>Rules</h2>
-    <ul>
-      <li>Mode: <strong>Dagger 1v1</strong> only</li>
-      <li>First to <strong>5 points</strong> wins</li>
-      <li>Shield usage must be <strong>agreed on before the fight</strong></li>
-      <li>Tier tester decides your tier after the match</li>
-      <li>To rank up past <strong>LT2</strong>, you must defeat an <strong>LT2</strong> player</li>
-      <li><strong>HT1</strong> is the highest rank and is limited to <strong>one player</strong></li>
-    </ul>
-  </div>
+<div class="rules">
+  <h2>Rules</h2>
+  <ul>
+    <li>Mode: <strong>Dagger 1v1</strong></li>
+    <li>First to <strong>5 points</strong> wins</li>
+    <li>Shield usage must be agreed on before the fight</li>
+    <li>Tier tester decides your tier</li>
+    <li>To rank up past <strong>LT2</strong>, you must defeat an <strong>LT2</strong> player</li>
+    <li>Each region can only have <strong>ONE HT1</strong></li>
+    <li>Only the <strong>top 10</strong> players per region may upload a custom skin</li>
+  </ul>
+</div>
 
-  <div class="grid" id="players"></div>
+<div id="boards"></div>
 
-  <footer>
-    Not affiliated with taming.io • Rankings decided by certified testers
-  </footer>
+<footer>
+  Not affiliated with taming.io • Community tier system
+</footer>
 
-  <script>
-    const players = [
-      {
-        name: "Bigman",
-        tier: "LT2",
-        region: "EU",
-        avatar: "https://i.imgur.com/0y0y0y0.png"
-      },
-      {
-        name: "PlayerTwo",
-        tier: "HT3",
-        region: "NA",
-        avatar: "https://i.imgur.com/0y0y0y0.png"
-      },
-      {
-        name: "TopPlayer",
-        tier: "HT1",
-        region: "AS",
-        avatar: "https://i.imgur.com/0y0y0y0.png"
-      }
-    ];
+<script>
+const players = [
+  { name: "TopEU", tier: "HT1", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "EU_Pro", tier: "HT2", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "NA_God", tier: "HT1", region: "NA", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "AS_King", tier: "HT1", region: "AS", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "Bigman", tier: "LT2", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" }
+];
 
-    const container = document.getElementById('players');
+const tierOrder = ["HT1","LT1","HT2","LT2","HT3","LT3","HT4","LT4","HT5","LT5"];
+const regions = ["GLOBAL","EU","NA","AS"];
 
-    players.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'player';
+function buildBoard(region) {
+  let list = region === "GLOBAL"
+    ? [...players]
+    : players.filter(p => p.region === region);
 
-      card.innerHTML = `
-        <img class="avatar" src="${p.avatar}" />
-        <div class="info">
-          <div class="name">${p.name}</div>
-          <div class="region">Region: ${p.region}</div>
-        </div>
-        <div class="tier ${p.tier}">${p.tier}</div>
-      `;
+  list.sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
 
-      container.appendChild(card);
-    });
-  </script>
+  const board = document.createElement('div');
+  board.className = 'leaderboard';
+
+  board.innerHTML = `<h2>${region} Leaderboard</h2>`;
+
+  list.slice(0,10).forEach((p,i) => {
+    const row = document.createElement('div');
+    row.className = 'row ' + (i===0?'top1':i===1?'top2':i===2?'top3':'');
+
+    const avatar = i < 10 && p.avatar
+      ? `<img class="avatar" src="${p.avatar}">`
+      : `<div class="avatar"></div>`;
+
+    row.innerHTML = `
+      <div class="pos">${i+1}.</div>
+      ${avatar}
+      <div>
+        <div class="name">${p.name}</div>
+        <div class="region">${p.region}</div>
+      </div>
+      <div></div>
+      <div class="tier">${p.tier}</div>
+    `;
+
+    board.appendChild(row);
+  });
+
+  return board;
+}
+
+const boards = document.getElementById('boards');
+regions.forEach(r => boards.appendChild(buildBoard(r)));
+</script>
 
 </body>
 </html>
