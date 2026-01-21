@@ -14,6 +14,9 @@
       --gold: #ffd700;
       --silver: #cfd8dc;
       --bronze: #cd7f32;
+      --eu: #3bff7a;
+      --na: #ff4b4b;
+      --as: #4bd9ff;
     }
 
     * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
@@ -25,20 +28,22 @@
       padding: 24px;
     }
 
-    h1 { margin-bottom: 4px; }
-    .subtitle { color: var(--muted); margin-bottom: 24px; }
+    h1 { text-align: center; margin-bottom: 6px; }
+    .subtitle { text-align: center; color: var(--muted); margin-bottom: 32px; }
 
     .rules {
       background: var(--card);
       padding: 16px;
       border-radius: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 48px;
+      max-width: 900px;
+      margin-inline: auto;
     }
 
+    /* Leaderboard layout */
     .leaderboard {
       background: var(--card);
-      border-radius: 14px;
-      margin-bottom: 32px;
+      border-radius: 16px;
       overflow: hidden;
     }
 
@@ -47,14 +52,24 @@
       padding: 14px 16px;
       background: #1f1f27;
       font-size: 18px;
+      text-align: center;
     }
 
-    .row {
+    .header, .row {
       display: grid;
-      grid-template-columns: 40px 56px 1fr 80px 70px;
+      grid-template-columns: 40px 56px 1fr 120px 80px;
       align-items: center;
       gap: 12px;
       padding: 10px 16px;
+    }
+
+    .header {
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .row {
       border-top: 1px solid rgba(255,255,255,0.05);
     }
 
@@ -62,7 +77,7 @@
     .row.top2 { background: rgba(207,216,220,0.08); }
     .row.top3 { background: rgba(205,127,50,0.08); }
 
-    .pos { font-weight: 700; opacity: 0.8; }
+    .pos { font-weight: 700; opacity: 0.85; }
 
     .avatar {
       width: 48px;
@@ -73,15 +88,43 @@
     }
 
     .name { font-weight: 600; }
-    .region { font-size: 13px; color: var(--muted); }
+
+    .region-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .EU { border: 2px solid var(--eu); color: var(--eu); }
+    .NA { border: 2px solid var(--na); color: var(--na); }
+    .AS { border: 2px solid var(--as); color: var(--as); }
 
     .tier {
       text-align: right;
-      font-weight: 700;
+      font-weight: 800;
+    }
+
+    /* Layout positioning */
+    .global-wrapper {
+      max-width: 900px;
+      margin: 0 auto 80px auto;
+    }
+
+    .regional-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     footer {
-      margin-top: 48px;
+      margin-top: 64px;
       color: var(--muted);
       font-size: 14px;
       text-align: center;
@@ -90,31 +133,31 @@
 </head>
 <body>
 
-<h1>Taming.io – Dagger 1v1 Tiers</h1>
-<div class="subtitle">Vertical competitive leaderboards</div>
+<h1>Taming.io – Dagger 1v1</h1>
+<div class="subtitle">Official Community Leaderboards</div>
 
 <div class="rules">
-  <h2>Rules</h2>
+  <h3>Rules</h3>
   <ul>
-    <li>Mode: <strong>Dagger 1v1</strong></li>
-    <li>First to <strong>5 points</strong> wins</li>
-    <li>Shield usage must be agreed on before the fight</li>
-    <li>Tier tester decides your tier</li>
-    <li>To rank up past <strong>LT2</strong>, you must defeat an <strong>LT2</strong> player</li>
-    <li>Each region can only have <strong>ONE HT1</strong></li>
-    <li>Only the <strong>top 10</strong> players per region may upload a custom skin</li>
+    <li>Dagger 1v1 only • First to 5 points</li>
+    <li>Shield usage must be agreed before the fight</li>
+    <li>Each region may only have <strong>one HT1</strong></li>
+    <li>The <strong>GLOBAL leaderboard</strong> may only have <strong>one HT1</strong></li>
+    <li>Only the <strong>top 10</strong> players per region may use a custom skin</li>
   </ul>
 </div>
 
-<div id="boards"></div>
+<div class="global-wrapper" id="global"></div>
+
+<div class="regional-wrapper" id="regional"></div>
 
 <footer>
-  Not affiliated with taming.io • Community tier system
+  Not affiliated with taming.io • Rankings decided by certified tier testers
 </footer>
 
 <script>
 const players = [
-  { name: "TopEU", tier: "HT1", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
+  { name: "GlobalKing", tier: "HT1", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
   { name: "EU_Pro", tier: "HT2", region: "EU", avatar: "https://i.imgur.com/0y0y0y0.png" },
   { name: "NA_God", tier: "HT1", region: "NA", avatar: "https://i.imgur.com/0y0y0y0.png" },
   { name: "AS_King", tier: "HT1", region: "AS", avatar: "https://i.imgur.com/0y0y0y0.png" },
@@ -122,19 +165,21 @@ const players = [
 ];
 
 const tierOrder = ["HT1","LT1","HT2","LT2","HT3","LT3","HT4","LT4","HT5","LT5"];
-const regions = ["GLOBAL","EU","NA","AS"];
 
-function buildBoard(region) {
-  let list = region === "GLOBAL"
-    ? [...players]
-    : players.filter(p => p.region === region);
-
-  list.sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
-
+function buildLeaderboard(title, list) {
   const board = document.createElement('div');
   board.className = 'leaderboard';
 
-  board.innerHTML = `<h2>${region} Leaderboard</h2>`;
+  board.innerHTML = `
+    <h2>${title}</h2>
+    <div class="header">
+      <div>#</div>
+      <div></div>
+      <div>Player</div>
+      <div>Region</div>
+      <div>Tier</div>
+    </div>
+  `;
 
   list.slice(0,10).forEach((p,i) => {
     const row = document.createElement('div');
@@ -145,13 +190,10 @@ function buildBoard(region) {
       : `<div class="avatar"></div>`;
 
     row.innerHTML = `
-      <div class="pos">${i+1}.</div>
+      <div class="pos">${i+1}</div>
       ${avatar}
-      <div>
-        <div class="name">${p.name}</div>
-        <div class="region">${p.region}</div>
-      </div>
-      <div></div>
+      <div class="name">${p.name}</div>
+      <div><span class="region-tag ${p.region}">${p.region}</span></div>
       <div class="tier">${p.tier}</div>
     `;
 
@@ -161,8 +203,24 @@ function buildBoard(region) {
   return board;
 }
 
-const boards = document.getElementById('boards');
-regions.forEach(r => boards.appendChild(buildBoard(r)));
+// GLOBAL leaderboard (only one HT1 allowed)
+const globalPlayers = [...players]
+  .sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+
+document.getElementById('global').appendChild(
+  buildLeaderboard('🌍 GLOBAL LEADERBOARD', globalPlayers)
+);
+
+// Regional leaderboards
+['EU','NA','AS'].forEach(region => {
+  const regionalPlayers = players
+    .filter(p => p.region === region)
+    .sort((a,b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+
+  document.getElementById('regional').appendChild(
+    buildLeaderboard(`${region} Leaderboard`, regionalPlayers)
+  );
+});
 </script>
 
 </body>
