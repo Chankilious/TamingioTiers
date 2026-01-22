@@ -16,33 +16,54 @@
     body{margin:0;background:var(--bg);color:var(--text);padding:24px}
 
     h1{text-align:center;margin-bottom:6px}
-    .subtitle{text-align:center;color:var(--muted);margin-bottom:32px}
+    .subtitle{text-align:center;color:var(--muted);margin-bottom:36px}
 
-    /* Info */
-    .info-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1100px;margin:0 auto 56px}
-    .box{background:var(--card);padding:18px;border-radius:14px}
-    .box h3{margin-top:0}
+    /* INFO */
+    .info-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1150px;margin:0 auto 64px}
+    .box{background:var(--card);padding:22px;border-radius:16px}
+    .box h3{margin-top:0;margin-bottom:14px}
+    .box ul{padding-left:18px}
+    .box li{margin-bottom:10px;line-height:1.5}
 
-    .tiers-list{padding-left:0}
-    .tier-group{list-style:none;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .tier-group:last-child{border-bottom:none}
-
-    /* Search */
-    .search-wrap{max-width:900px;margin:0 auto 24px}
-    .search-wrap input{
-      width:100%;padding:12px 14px;border-radius:12px;border:none;
-      background:#1f1f27;color:var(--text);font-size:15px
+    /* TIERS */
+    .tiers-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      column-gap:32px;
+      row-gap:18px;
     }
+    .tier-pair{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:12px}
+    .tier-pair:last-child{border-bottom:none}
 
-    /* Leaderboards */
+    /* FORM */
+    .form-wrap{max-width:700px;margin:0 auto 72px}
+    .form-wrap h2{text-align:center;margin-bottom:14px}
+    form{background:var(--card);padding:22px;border-radius:16px}
+    label{display:block;margin-bottom:6px;color:var(--muted)}
+    input{
+      width:100%;padding:12px 14px;margin-bottom:16px;border-radius:12px;
+      border:none;background:#1f1f27;color:var(--text)
+    }
+    button{
+      width:100%;padding:12px;border:none;border-radius:12px;
+      background:linear-gradient(90deg,var(--gold),#ffea80);
+      font-weight:800;cursor:pointer
+    }
+    .form-note{margin-top:10px;font-size:14px;color:var(--muted)}
+
+    /* SEARCH */
+    .search-wrap{max-width:900px;margin:0 auto 24px}
+    .search-wrap input{width:100%;padding:12px 14px;border-radius:12px;border:none;background:#1f1f27;color:var(--text)}
+
+    /* LEADERBOARDS */
     .leaderboard{background:var(--card);border-radius:16px;overflow:hidden}
-    .leaderboard h2{margin:0;padding:14px 16px;background:#1f1f27;text-align:center}
+    .leaderboard h2{text-align:center;margin:0;padding:14px;background:#1f1f27}
 
     .header,.row{
       display:grid;
-      grid-template-columns:50px 60px 1fr 140px 90px;
+      grid-template-columns:60px 70px 1fr 140px 110px;
       align-items:center;
-      padding:10px 16px;
+      padding:12px 18px;
     }
     .header{font-size:13px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.08)}
     .row{border-top:1px solid rgba(255,255,255,.05);cursor:pointer}
@@ -52,33 +73,29 @@
     .row.top3{background:rgba(205,127,50,.08)}
 
     .pos{text-align:center;font-weight:700}
-    .avatar{width:48px;height:48px;border-radius:10px;object-fit:cover}
+    .avatar{width:52px;height:52px;border-radius:12px;object-fit:cover}
     .name{font-weight:600}
     .tier{text-align:center;font-weight:800}
 
-    .region-tag{
-      padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;
-      text-align:center;margin:auto
-    }
+    .region-tag{padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;text-align:center;margin:auto}
     .EU{border:2px solid var(--eu);color:var(--eu)}
     .NA{border:2px solid var(--na);color:var(--na)}
     .AS{border:2px solid var(--as);color:var(--as)}
 
-    /* Crown */
     .crown{margin-left:6px;filter:drop-shadow(0 0 6px var(--gold));animation:glow 2s infinite alternate}
-    @keyframes glow{from{filter:drop-shadow(0 0 6px var(--gold))}to{filter:drop-shadow(0 0 14px var(--gold))}}
+    @keyframes glow{to{filter:drop-shadow(0 0 14px var(--gold))}}
 
-    /* Layout */
-    .global-wrapper{max-width:1000px;margin:0 auto 80px}
-    .regional-wrapper{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:32px;max-width:1300px;margin:0 auto}
+    /* LAYOUT */
+    .global-wrapper{max-width:1050px;margin:0 auto 96px}
+    .regional-wrapper{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:36px;max-width:1350px;margin:0 auto}
 
-    /* Profile modal */
+    /* MODAL */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
-    .modal-content{background:var(--card);padding:22px;border-radius:16px;max-width:420px;width:100%}
+    .modal-content{background:var(--card);padding:24px;border-radius:18px;max-width:420px;width:100%}
     .modal img{width:96px;height:96px;border-radius:14px;margin-bottom:12px}
-    .close{cursor:pointer;color:var(--muted);float:right}
+    .close{float:right;cursor:pointer;color:var(--muted)}
 
-    footer{text-align:center;margin-top:64px;color:var(--muted);font-size:14px}
+    footer{text-align:center;margin-top:72px;color:var(--muted);font-size:14px}
   </style>
 </head>
 <body>
@@ -93,81 +110,101 @@
       <li>Dagger 1v1 only • First to 5 points</li>
       <li>Shield usage must be agreed before the fight</li>
       <li>For global testing, both players must play <strong>5 rounds in each player’s main region</strong></li>
-      <li><strong>Tier requirement:</strong> players must be tested by a verified <strong>HT3 tier tester</strong>. To gain a tier, you must defeat a player already holding that tier (example: beat an LT2 to become LT2).</li>
+      <li><strong>Tier requirement:</strong> players must be tier tested by a verified <strong>HT3 tester</strong>. To obtain a tier, you must defeat a player already holding that tier.</li>
     </ul>
   </div>
 
   <div class="box">
     <h3>Tiers</h3>
-    <ul class="tiers-list">
-      <li class="tier-group"><strong>HT1</strong> – Best player overall<br><strong>LT1</strong></li>
-      <li class="tier-group"><strong>HT2</strong><br><strong>LT2</strong></li>
-      <li class="tier-group"><strong>HT3</strong> – Tier testers<br><strong>LT3</strong></li>
-      <li class="tier-group"><strong>HT4</strong><br><strong>LT4</strong></li>
-      <li class="tier-group"><strong>HT5</strong><br><strong>LT5</strong> – Untested</li>
-    </ul>
+    <div class="tiers-grid">
+      <div class="tier-pair"><strong>HT1</strong><br>Best player overall</div>
+      <div class="tier-pair"><strong>LT1</strong></div>
+      <div class="tier-pair"><strong>HT2</strong></div>
+      <div class="tier-pair"><strong>LT2</strong></div>
+      <div class="tier-pair"><strong>HT3</strong><br>Tier testers</div>
+      <div class="tier-pair"><strong>LT3</strong></div>
+      <div class="tier-pair"><strong>HT4</strong></div>
+      <div class="tier-pair"><strong>LT4</strong></div>
+      <div class="tier-pair"><strong>HT5</strong></div>
+      <div class="tier-pair"><strong>LT5</strong><br>Untested</div>
+    </div>
   </div>
 </div>
 
-<div class="search-wrap">
-  <input id="search" placeholder="Search player..." />
+<div class="form-wrap">
+  <h2>Tier Test Submission</h2>
+  <form onsubmit="submitForm(event)">
+    <label>Player Name</label>
+    <input id="fname" required>
+    <label>Taming.io ID</label>
+    <input id="fid" required>
+    <button type="submit">Submit for Approval</button>
+    <div class="form-note">Approved players will be added as <strong>LT5</strong> after review.</div>
+  </form>
 </div>
+
+<div class="search-wrap"><input id="search" placeholder="Search players..."></div>
 
 <div class="global-wrapper" id="global"></div>
 <div class="regional-wrapper" id="regional"></div>
 
-<div class="modal" id="modal">
-  <div class="modal-content" id="modalContent"></div>
-</div>
+<div class="modal" id="modal"><div class="modal-content" id="modalContent"></div></div>
 
 <footer>Not affiliated with taming.io • Rankings decided by certified tier testers</footer>
 
 <script>
-const players=[
- {name:'Kiru',tier:'HT1',region:'AS',avatar:'https://i.imgur.com/0y0y0y0.png'},
- {name:'EU_Pro',tier:'LT1',region:'EU',avatar:'https://i.imgur.com/0y0y0y0.png'},
- {name:'NA_Elite',tier:'LT2',region:'NA',avatar:'https://i.imgur.com/0y0y0y0.png'}
+let players=[
+ {name:'Chanky',tier:'HT1',region:'EU',id:'EU-53235',avatar:'https://static.wikia.nocookie.net/tamingio/images/a/af/Skin-cyber_cat.png'},
+ {name:'EU_Pro',tier:'LT1',region:'EU',id:'EU-22190',avatar:'https://i.imgur.com/0y0y0y0.png'},
+ {name:'NA_Elite',tier:'LT2',region:'NA',id:'NA-55213',avatar:'https://i.imgur.com/0y0y0y0.png'}
 ];
 
 const tierOrder=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
 
 function build(title,list,showRegion){
- const board=document.createElement('div');board.className='leaderboard';
- board.innerHTML=`<h2>${title}</h2><div class="header"><div>#</div><div></div><div>Player</div>${showRegion?'<div>Region</div>':''}<div>Tier</div></div>`;
+ const b=document.createElement('div');b.className='leaderboard';
+ b.innerHTML=`<h2>${title}</h2><div class="header"><div>#</div><div></div><div>Player</div>${showRegion?'<div>Region</div>':''}<div>Tier</div></div>`;
  list.forEach((p,i)=>{
   const r=document.createElement('div');
   r.className='row '+(i===0?'top1':i===1?'top2':i===2?'top3':'');
   r.onclick=()=>openProfile(p);
   r.innerHTML=`<div class="pos">${i+1}</div><img class="avatar" src="${p.avatar}"><div class="name">${p.name}${title.includes('GLOBAL')&&i===0?' <span class="crown">👑</span>':''}</div>${showRegion?`<div><span class="region-tag ${p.region}">${p.region}</span></div>`:''}<div class="tier">${p.tier}</div>`;
-  board.appendChild(r);
+  b.appendChild(r);
  });
- return board;
+ return b;
 }
 
-const sorted=[...players].sort((a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier));
-const global=sorted.map((p,i)=>i===0?{...p,tier:'HT1'}:i===1?{...p,tier:'LT1'}:p);
+function render(){
+ document.getElementById('global').innerHTML='';
+ document.getElementById('regional').innerHTML='';
+ const sorted=[...players].sort((a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier));
+ const global=sorted.map((p,i)=>i===0?{...p,tier:'HT1'}:i===1?{...p,tier:'LT1'}:p);
+ document.getElementById('global').appendChild(build('🌍 GLOBAL LEADERBOARD',global,true));
+ ['EU','NA','AS'].forEach(r=>{
+  document.getElementById('regional').appendChild(build(`${r} Leaderboard`,players.filter(p=>p.region===r),false));
+ });
+}
+render();
 
-document.getElementById('global').appendChild(build('🌍 GLOBAL LEADERBOARD',global,true));
-['EU','NA','AS'].forEach(r=>{
- document.getElementById('regional').appendChild(build(`${r} Leaderboard`,players.filter(p=>p.region===r),false));
-});
+function submitForm(e){
+ e.preventDefault();
+ alert('Submission received! Await approval.');
+ e.target.reset();
+}
 
-// Search
-const search=document.getElementById('search');
+// SEARCH
 search.oninput=()=>{
  const q=search.value.toLowerCase();
  document.querySelectorAll('.row').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(q)?'':'none');
 };
 
-// Modal
+// PROFILE
 function openProfile(p){
- const m=document.getElementById('modal');
- const c=document.getElementById('modalContent');
- c.innerHTML=`<span class="close" onclick="closeModal()">✖</span><img src="${p.avatar}"><h3>${p.name}</h3><p>Region: ${p.region}</p><p>Tier: ${p.tier}</p>`;
- m.style.display='flex';
+ modal.style.display='flex';
+ modalContent.innerHTML=`<span class="close" onclick="modal.style.display='none'">✖</span><img src="${p.avatar}"><h3>${p.name}</h3><p><strong>Region:</strong> ${p.region}</p><p><strong>Tier:</strong> ${p.tier}</p><p><strong>Taming.io ID:</strong> ${p.id}</p>`;
 }
-function closeModal(){document.getElementById('modal').style.display='none'}
 </script>
 
 </body>
 </html>
+
