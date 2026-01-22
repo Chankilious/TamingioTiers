@@ -66,12 +66,39 @@
     .regional-wrapper{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:36px;max-width:1350px;margin:0 auto}
 
     footer{text-align:center;margin-top:72px;color:var(--muted);font-size:14px}
+
+    /* Login style */
+    #login {
+      max-width:400px;
+      margin:0 auto 24px;
+      background:var(--card);
+      padding:18px;
+      border-radius:16px;
+      text-align:center;
+    }
+    #login input { margin-bottom:10px; }
+    #adminToggle {
+      display:none;
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      z-index:9999;
+    }
   </style>
 </head>
 <body>
 
 <h1>Taming.io – Dagger 1v1</h1>
 <div class="subtitle">Official Community Leaderboards</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <h3>Admin Login</h3>
+  <input id="loginEmail" placeholder="Email" />
+  <input id="loginPass" type="password" placeholder="Password" />
+  <button onclick="loginAdmin()">Login</button>
+  <div id="loginMsg"></div>
+</div>
 
 <div class="info-wrapper">
   <div class="box">
@@ -135,7 +162,6 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2F0aGR4Ymd1eG1tYnlpcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNDAzNTAsImV4cCI6MjA4NDYxNjM1MH0.sgTKcogalJzYUA2t9lXQpg7ImgGrrdPzwFOGF7Byiq4";
 
   const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   const tierOrder=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
 
   // ================= LOAD PLAYERS =================
@@ -153,9 +179,7 @@
       const r=document.createElement('div');
       r.className='row '+(i===0?'top1':i===1?'top2':i===2?'top3':'');
 
-      // If player has no skin_url, it will use default blank
       const avatar = p.skin_url || '';
-
       r.innerHTML=`<div class="pos">${i+1}</div>
                    <img class="avatar" src="${avatar}">
                    <div class="name">${p.name}${title.includes('GLOBAL')&&i===0?' <span class="crown">👑</span>':''}</div>
@@ -237,7 +261,7 @@
   <div id="adminPlayers"></div>
 </div>
 
-<button id="adminToggle" onclick="toggleAdminPanel()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:9999">Admin</button>
+<button id="adminToggle" onclick="toggleAdminPanel()">Admin</button>
 
 <script>
   let isAdmin = false;
@@ -255,6 +279,7 @@
     if (admin) {
       isAdmin = true;
       document.getElementById('adminToggle').style.display = 'block';
+      document.getElementById('login').style.display = 'none'; // hide login
       loadPending();
       loadAdminPlayers();
     }
@@ -336,9 +361,20 @@
     await supabase.auth.signOut();
     window.location.reload();
   }
+
+  async function loginAdmin() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPass").value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      loginMsg.innerHTML = '<div class="error">Login failed</div>';
+    } else {
+      loginMsg.innerHTML = '<div class="success">Logged in!</div>';
+      window.location.reload();
+    }
+  }
 </script>
 
 </body>
 </html>
-
-
