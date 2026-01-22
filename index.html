@@ -77,13 +77,6 @@
       text-align:center;
     }
     #login input { margin-bottom:10px; }
-    #adminToggle {
-      display:none;
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      z-index:9999;
-    }
   </style>
 </head>
 <body>
@@ -159,7 +152,7 @@
 <script>
   // ================= SUPABASE SETUP =================
   const SUPABASE_URL = "https://mnwathdxbguxmmbyirsu.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2F0aGR4Ymd1eG1tYnlpcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNDAzNTAsImV4cCI6MjA4NDYxNjM1MH0.sgTKcogalJzYUA2t9lXQpg7ImgGrrdPzwFOGF7Byiq4";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2F0aGR4Ymd1eG1t9lXQpg7ImgGrrdPzwFOGF7Byiq4";
 
   const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const tierOrder=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
@@ -238,58 +231,72 @@
 </script>
 
 <!-- ADMIN PANEL -->
-<div id="adminPanel" style="display:none;position:fixed;top:0;right:0;width:360px;height:100%;background:#0f0f14;border-left:2px solid #222;padding:12px;overflow-y:auto;z-index:9999">
-  <h2 style="color:#fff">Admin Panel</h2>
-
-  <button onclick="logoutAdmin()">Logout</button>
-
-  <hr>
-  <h3>Pending Submissions</h3>
-  <div id="pendingList"></div>
-
-  <hr>
-  <h3>Add / Edit Player</h3>
-  <input id="ap_name" placeholder="Player name">
-  <input id="ap_id" placeholder="Taming ID (numbers)">
-  <input id="ap_region" placeholder="Region (EU / NA / AS)">
-  <input id="ap_tier" placeholder="Tier (HT1, LT2, etc)">
-  <input id="ap_skin" placeholder="Skin image URL">
-  <button onclick="savePlayer()">Save Player</button>
-
-  <hr>
-  <h3>Players</h3>
-  <div id="adminPlayers"></div>
-</div>
-
-<button id="adminToggle" onclick="toggleAdminPanel()">Admin</button>
-
 <script>
+  // Admin panel only loads if admin login succeeds
+
   let isAdmin = false;
 
-  async function checkAdmin() {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) return;
+  async function loginAdmin() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPass").value;
 
-    const { data: admin } = await supabase
-      .from('admins')
-      .select('*')
-      .eq('user_id', data.user.id)
-      .single();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (admin) {
-      isAdmin = true;
-      document.getElementById('adminToggle').style.display = 'block';
-      document.getElementById('login').style.display = 'none'; // hide login
-      loadPending();
-      loadAdminPlayers();
+    if (error) {
+      loginMsg.innerHTML = '<div class="error">Login failed</div>';
+      return;
     }
+
+    // verify admin
+    const { data: user } = await supabase.auth.getUser();
+    const { data: admin } = await supabase.from('admins').select('*').eq('user_id', user.user.id).single();
+
+    if (!admin) {
+      loginMsg.innerHTML = '<div class="error">Not an admin</div>';
+      await supabase.auth.signOut();
+      return;
+    }
+
+    isAdmin = true;
+    loginMsg.innerHTML = '<div class="success">Logged in as admin!</div>';
+    document.getElementById("login").style.display = "none";
+
+    showAdminPanel();
   }
 
-  checkAdmin();
+  function showAdminPanel() {
+    // Create admin panel HTML dynamically
+    const panel = document.createElement("div");
+    panel.id = "adminPanel";
+    panel.style = "position:fixed;top:0;right:0;width:360px;height:100%;background:#0f0f14;border-left:2px solid #222;padding:12px;overflow-y:auto;z-index:9999";
 
-  function toggleAdminPanel() {
-    const panel = document.getElementById('adminPanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    panel.innerHTML = `
+      <h2 style="color:#fff">Admin Panel</h2>
+      <button onclick="logoutAdmin()">Logout</button>
+      <hr>
+      <h3>Pending Submissions</h3>
+      <div id="pendingList"></div>
+      <hr>
+      <h3>Add / Edit Player</h3>
+      <input id="ap_name" placeholder="Player name">
+      <input id="ap_id" placeholder="Taming ID (numbers)">
+      <input id="ap_region" placeholder="Region (EU / NA / AS)">
+      <input id="ap_tier" placeholder="Tier (HT1, LT2, etc)">
+      <input id="ap_skin" placeholder="Skin image URL">
+      <button onclick="savePlayer()">Save Player</button>
+      <hr>
+      <h3>Players</h3>
+      <div id="adminPlayers"></div>
+    `;
+
+    document.body.appendChild(panel);
+    loadPending();
+    loadAdminPlayers();
+  }
+
+  async function logoutAdmin(){
+    await supabase.auth.signOut();
+    window.location.reload();
   }
 
   async function loadPending() {
@@ -355,24 +362,6 @@
     await supabase.from('players').delete().eq('taming_id', id);
     loadPlayers();
     loadAdminPlayers();
-  }
-
-  async function logoutAdmin(){
-    await supabase.auth.signOut();
-    window.location.reload();
-  }
-
-  async function loginAdmin() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPass").value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      loginMsg.innerHTML = '<div class="error">Login failed</div>';
-    } else {
-      loginMsg.innerHTML = '<div class="success">Logged in!</div>';
-      window.location.reload();
-    }
   }
 </script>
 
