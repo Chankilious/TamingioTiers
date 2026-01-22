@@ -77,6 +77,12 @@
       text-align:center;
     }
     #login input { margin-bottom:10px; }
+
+    /* red glow for wrong login */
+    .errorGlow {
+      animation: glow 1s infinite alternate;
+      border: 2px solid var(--danger);
+    }
   </style>
 </head>
 <body>
@@ -89,7 +95,7 @@
   <h3>Admin Login</h3>
   <input id="loginEmail" placeholder="Email" />
   <input id="loginPass" type="password" placeholder="Password" />
-  <button onclick="loginAdmin()">Login</button>
+  <button id="loginBtn">Login</button>
   <div id="loginMsg"></div>
 </div>
 
@@ -220,23 +226,23 @@
   };
 
   // ================= SEARCH =================
-  search.oninput=()=>{
-    const q=search.value.toLowerCase();
+  document.getElementById("search").oninput = ()=>{
+    const q = document.getElementById("search").value.toLowerCase();
     document.querySelectorAll('.row').forEach(r=>{
-      r.style.display=r.innerText.toLowerCase().includes(q)?'':'none';
+      r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
     });
   };
 
   loadPlayers();
-</script>
 
-<!-- ADMIN PANEL -->
-<script>
-  // Admin panel only loads if admin login succeeds
+  // ================= ADMIN LOGIN =================
+  const loginBtn = document.getElementById("loginBtn");
+  const loginMsg = document.getElementById("loginMsg");
 
-  let isAdmin = false;
+  loginBtn.addEventListener("click", async () => {
+    loginMsg.innerHTML = "";
+    loginBtn.classList.remove("errorGlow");
 
-  async function loginAdmin() {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPass").value;
 
@@ -244,6 +250,7 @@
 
     if (error) {
       loginMsg.innerHTML = '<div class="error">Login failed</div>';
+      loginBtn.classList.add("errorGlow");
       return;
     }
 
@@ -254,18 +261,17 @@
     if (!admin) {
       loginMsg.innerHTML = '<div class="error">Not an admin</div>';
       await supabase.auth.signOut();
+      loginBtn.classList.add("errorGlow");
       return;
     }
 
-    isAdmin = true;
     loginMsg.innerHTML = '<div class="success">Logged in as admin!</div>';
     document.getElementById("login").style.display = "none";
-
     showAdminPanel();
-  }
+  });
 
+  // ================= ADMIN PANEL (DYNAMIC) =================
   function showAdminPanel() {
-    // Create admin panel HTML dynamically
     const panel = document.createElement("div");
     panel.id = "adminPanel";
     panel.style = "position:fixed;top:0;right:0;width:360px;height:100%;background:#0f0f14;border-left:2px solid #222;padding:12px;overflow-y:auto;z-index:9999";
