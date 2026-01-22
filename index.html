@@ -130,81 +130,89 @@
 <footer>Not affiliated with taming.io • Rankings decided by certified tier testers</footer>
 
 <script>
-// ================= SUPABASE SETUP =================
-const supabase = supabaseJs.createClient(
-  "https://mnwathdxbguxmmbyirsu.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2F0aGR4Ymd1eG1tYnlpcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNDAzNTAsImV4cCI6MjA4NDYxNjM1MH0.sgTKcogalJzYUA2t9lXQpg7ImgGrrdPzwFOGF7Byiq4"
-);
+  // ================= SUPABASE SETUP =================
+  const SUPABASE_URL = "https://mnwathdxbguxmmbyirsu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2F0aGR4Ymd1eG1tYnlpcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNDAzNTAsImV4cCI6MjA4NDYxNjM1MH0.sgTKcogalJzYUA2t9lXQpg7ImgGrrdPzwFOGF7Byiq4";
 
-const tierOrder=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ================= LOAD PLAYERS =================
-async function loadPlayers(){
-  const { data, error } = await supabase
-    .from('players')
-    .select('*');
+  const tierOrder=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
 
-  if(error){console.error(error);return;}
-
-  renderLeaderboards(data);
-}
-
-// ================= RENDER =================
-function build(title,list,showRegion){
-  const b=document.createElement('div');b.className='leaderboard';
-  b.innerHTML=`<h2>${title}</h2><div class="header"><div>#</div><div></div><div>Player</div>${showRegion?'<div>Region</div>':''}<div>Tier</div></div>`;
-  list.forEach((p,i)=>{
-    const r=document.createElement('div');
-    r.className='row '+(i===0?'top1':i===1?'top2':i===2?'top3':'');
-    r.innerHTML=`<div class="pos">${i+1}</div><img class="avatar" src="${p.avatar_url||''}"><div class="name">${p.name}${title.includes('GLOBAL')&&i===0?' <span class="crown">👑</span>':''}</div>${showRegion?`<div><span class="region-tag ${p.region}">${p.region}</span></div>`:''}<div class="tier">${p.tier}</div>`;
-    b.appendChild(r);
-  });return b;
-}
-
-function renderLeaderboards(players){
-  global.innerHTML='';regional.innerHTML='';
-  const sorted=[...players].sort((a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier));
-  global.appendChild(build('🌍 GLOBAL LEADERBOARD',sorted,true));
-  ['EU','NA','AS'].forEach(r=>regional.appendChild(build(`${r} Leaderboard`,players.filter(p=>p.region===r),false)));
-}
-
-// ================= SUBMIT =================
-document.getElementById('submitForm').onsubmit = async (e)=>{
-  e.preventDefault();
-  const name=fname.value.trim();
-  const id=fid.value.trim();
-  const region=fregion.value;
-  formMsg.innerHTML='';
-
-  if(!/^[0-9]+$/.test(id)){
-    formMsg.innerHTML='<div class="error">ID must be numbers only.</div>';
-    return;
+  // ================= LOAD PLAYERS =================
+  async function loadPlayers(){
+    const { data, error } = await supabase.from('players').select('*');
+    if(error){console.error(error);return;}
+    renderLeaderboards(data);
   }
 
-  const { error } = await supabase.from('pending_submissions').insert({
-    name,
-    taming_id:id,
-    region
-  });
+  // ================= RENDER =================
+  function build(title,list,showRegion){
+    const b=document.createElement('div');b.className='leaderboard';
+    b.innerHTML=`<h2>${title}</h2><div class="header"><div>#</div><div></div><div>Player</div>${showRegion?'<div>Region</div>':''}<div>Tier</div></div>`;
+    list.forEach((p,i)=>{
+      const r=document.createElement('div');
+      r.className='row '+(i===0?'top1':i===1?'top2':i===2?'top3':'');
 
-  if(error){
-    formMsg.innerHTML='<div class="error">You have already submitted or an error occurred.</div>';
-  } else {
-    formMsg.innerHTML='<div class="success">Submission received. Await approval.</div>';
-    e.target.reset();
+      // If player has no skin_url, it will use default blank
+      const avatar = p.skin_url || '';
+
+      r.innerHTML=`<div class="pos">${i+1}</div>
+                   <img class="avatar" src="${avatar}">
+                   <div class="name">${p.name}${title.includes('GLOBAL')&&i===0?' <span class="crown">👑</span>':''}</div>
+                   ${showRegion?`<div><span class="region-tag ${p.region}">${p.region}</span></div>`:''}
+                   <div class="tier">${p.tier}</div>`;
+      b.appendChild(r);
+    });
+    return b;
   }
-};
 
-// ================= SEARCH =================
-search.oninput=()=>{
-  const q=search.value.toLowerCase();
-  document.querySelectorAll('.row').forEach(r=>{
-    r.style.display=r.innerText.toLowerCase().includes(q)?'':'none';
-  });
-};
+  function renderLeaderboards(players){
+    global.innerHTML='';
+    regional.innerHTML='';
 
-loadPlayers();
+    const sorted=[...players].sort((a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier));
+    global.appendChild(build('🌍 GLOBAL LEADERBOARD',sorted,true));
+    ['EU','NA','AS'].forEach(r=>regional.appendChild(build(`${r} Leaderboard`,players.filter(p=>p.region===r),false)));
+  }
+
+  // ================= SUBMIT =================
+  document.getElementById('submitForm').onsubmit = async (e)=>{
+    e.preventDefault();
+    const name=fname.value.trim();
+    const id=fid.value.trim();
+    const region=fregion.value;
+    formMsg.innerHTML='';
+
+    if(!/^[0-9]+$/.test(id)){
+      formMsg.innerHTML='<div class="error">ID must be numbers only.</div>';
+      return;
+    }
+
+    const { error } = await supabase.from('pending_submissions').insert({
+      name,
+      taming_id:id,
+      region
+    });
+
+    if(error){
+      formMsg.innerHTML='<div class="error">You have already submitted or an error occurred.</div>';
+    } else {
+      formMsg.innerHTML='<div class="success">Submission received. Await approval.</div>';
+      e.target.reset();
+    }
+  };
+
+  // ================= SEARCH =================
+  search.oninput=()=>{
+    const q=search.value.toLowerCase();
+    document.querySelectorAll('.row').forEach(r=>{
+      r.style.display=r.innerText.toLowerCase().includes(q)?'':'none';
+    });
+  };
+
+  loadPlayers();
 </script>
+
 <!-- ADMIN PANEL -->
 <div id="adminPanel" style="display:none;position:fixed;top:0;right:0;width:360px;height:100%;background:#0f0f14;border-left:2px solid #222;padding:12px;overflow-y:auto;z-index:9999">
   <h2 style="color:#fff">Admin Panel</h2>
@@ -232,99 +240,105 @@ loadPlayers();
 <button id="adminToggle" onclick="toggleAdminPanel()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:9999">Admin</button>
 
 <script>
-let isAdmin = false;
+  let isAdmin = false;
 
-async function checkAdmin() {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
+  async function checkAdmin() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
 
-  const { data: admin } = await supabase
-    .from('admins')
-    .select('*')
-    .eq('user_id', data.user.id)
-    .single();
+    const { data: admin } = await supabase
+      .from('admins')
+      .select('*')
+      .eq('user_id', data.user.id)
+      .single();
 
-  if (admin) {
-    isAdmin = true;
-    document.getElementById('adminToggle').style.display = 'block';
+    if (admin) {
+      isAdmin = true;
+      document.getElementById('adminToggle').style.display = 'block';
+      loadPending();
+      loadAdminPlayers();
+    }
+  }
+
+  checkAdmin();
+
+  function toggleAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function loadPending() {
+    const { data } = await supabase.from('pending_submissions').select('*');
+    const box = document.getElementById('pendingList');
+    box.innerHTML = '';
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.innerHTML = `${p.name} (${p.taming_id}) <button onclick="approve('${p.id}')">Approve</button> <button onclick="reject('${p.id}')">Reject</button>`;
+      box.appendChild(div);
+    });
+  }
+
+  async function approve(id) {
+    const { data } = await supabase.from('pending_submissions').select('*').eq('id', id).single();
+    await supabase.from('players').insert({
+      name: data.name,
+      taming_id: data.taming_id,
+      tier: 'LT5',
+      region: data.region || 'EU'
+    });
+    await supabase.from('pending_submissions').delete().eq('id', id);
     loadPending();
+    loadPlayers();
+  }
+
+  async function reject(id) {
+    await supabase.from('pending_submissions').delete().eq('id', id);
+    loadPending();
+  }
+
+  async function savePlayer() {
+    const name = ap_name.value;
+    const tid = ap_id.value;
+    const region = ap_region.value;
+    const tier = ap_tier.value;
+    const skin = ap_skin.value;
+
+    await supabase.from('players').upsert({
+      name,
+      taming_id: tid,
+      region,
+      tier,
+      skin_url: skin
+    }, { onConflict: 'taming_id' });
+
+    loadPlayers();
     loadAdminPlayers();
   }
-}
 
-checkAdmin();
+  async function loadAdminPlayers() {
+    const { data } = await supabase.from('players').select('*');
+    const box = document.getElementById('adminPlayers');
+    box.innerHTML = '';
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.innerHTML = `${p.name} (${p.tier}) <button onclick="removePlayer('${p.taming_id}')">Delete</button>`;
+      box.appendChild(div);
+    });
+  }
 
-function toggleAdminPanel() {
-  const panel = document.getElementById('adminPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
+  async function removePlayer(id) {
+    await supabase.from('players').delete().eq('taming_id', id);
+    loadPlayers();
+    loadAdminPlayers();
+  }
 
-async function loadPending() {
-  const { data } = await supabase.from('pending_submissions').select('*');
-  const box = document.getElementById('pendingList');
-  box.innerHTML = '';
-  data.forEach(p => {
-    const div = document.createElement('div');
-    div.innerHTML = `${p.player_name} (${p.taming_id}) <button onclick="approve('${p.id}')">Approve</button> <button onclick="reject('${p.id}')">Reject</button>`;
-    box.appendChild(div);
-  });
-}
-
-async function approve(id) {
-  const { data } = await supabase.from('pending_submissions').select('*').eq('id', id).single();
-  await supabase.from('players').insert({
-    name: data.player_name,
-    taming_id: data.taming_id,
-    tier: 'LT5',
-    region: data.region || 'EU'
-  });
-  await supabase.from('pending_submissions').delete().eq('id', id);
-  loadPending();
-  loadPlayers();
-}
-
-async function reject(id) {
-  await supabase.from('pending_submissions').delete().eq('id', id);
-  loadPending();
-}
-
-async function savePlayer() {
-  const name = ap_name.value;
-  const tid = ap_id.value;
-  const region = ap_region.value;
-  const tier = ap_tier.value;
-  const skin = ap_skin.value;
-
-  await supabase.from('players').upsert({
-    name,
-    taming_id: tid,
-    region,
-    tier,
-    skin_url: skin
-  }, { onConflict: 'taming_id' });
-
-  loadPlayers();
-  loadAdminPlayers();
-}
-
-async function loadAdminPlayers() {
-  const { data } = await supabase.from('players').select('*');
-  const box = document.getElementById('adminPlayers');
-  box.innerHTML = '';
-  data.forEach(p => {
-    const div = document.createElement('div');
-    div.innerHTML = `${p.name} (${p.tier}) <button onclick="removePlayer('${p.taming_id}')">Delete</button>`;
-    box.appendChild(div);
-  });
-}
-
-async function removePlayer(id) {
-  await supabase.from('players').delete().eq('taming_id', id);
-  loadPlayers();
-  loadAdminPlayers();
-}
+  async function logoutAdmin(){
+    await supabase.auth.signOut();
+    window.location.reload();
+  }
 </script>
 
 </body>
 </html>
+
 
